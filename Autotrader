@@ -1,0 +1,19 @@
+import scrapy
+
+class AutoTraderSpider(scrapy.Spider):
+    name = 'autotrader'
+    start_urls = ['https://www.autotrader.co.uk/car-search?search-target=usedcars&radius=1500&postcode=&make=&model=&min-price=&max-price=&min-year=&max-year=&min-mileage=&max-mileage=&min-engine-size=&max-engine-size=&fuel-type=&transmission=&max-doors=&max-seats=&exclude-writeoff-categories=on&exclude-total-loss=on&sort=default&page=1']
+   
+    def parse(self, response):
+        vehicles = response.xpath("//div[@class='search-page__result']")
+        for vehicle in vehicles:
+            yield {
+                'year': vehicle.xpath(".//div[@class='vehicle-details__year']/text()").get(),
+                'date_of_listing': vehicle.xpath(".//div[@class='vehicle-details__date']/text()").get(),
+                'make': vehicle.xpath(".//div[@class='vehicle-details__make-model']/text()").get().split(' ')[0],
+                'model': vehicle.xpath(".//div[@class='vehicle-details__make-model']/text()").get().split(' ')[1],
+                'engine_size': vehicle.xpath(".//div[@class='vehicle-details__spec']/text()").get().split(' ')[0],
+                'transmission': vehicle.xpath(".//div[@class='vehicle-details__spec']/text()").get().split(' ')[1],
+                'fuel_type': vehicle.xpath(".//div[@class='vehicle-details__spec']/text()").get().split(' ')[2],
+                'price': vehicle.xpath(".//div[@class='vehicle-price']/text()").get()
+            }
